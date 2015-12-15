@@ -50,9 +50,12 @@ class Controller {
  private:
   ButtonBlock* _bb;
   Display* _display;
-  enum states _mode;
+  enum states _currentState;
 
-  transitionInfo _stateTransitionMatrix[cnt_st][cnt_sg];
+  unsigned long _newDate;
+  unsigned long _newTime;
+
+  transitionInfo _stateMatrix[cnt_st][cnt_sg];
   void initFSM(void);
 
   enum signals _buttonToSignalMap[5] = {
@@ -85,6 +88,10 @@ class Controller {
                   enum signals signal);
   void dtm_common_transition_clear(enum states stateOld, enum states stateNew,
                     enum signals signal);
+  void dtm_common_lower(enum states stateOld, enum states stateNew,
+                        enum signals signal);
+  void dtm_common_higher(enum states stateOld, enum states stateNew,
+                        enum signals signal);
 };
 
 //void dtm_set_month_cl(enum states state, enum signals signal);

@@ -16,7 +16,22 @@ void TimeHelper::getDateAndTime(char* date, char* time) {
   sprintf(time, "%02d:%02d:%02d", now.hour(), now.minute(), now.second());
 }
 
+unsigned long TimeHelper::getYMD_long() {
+  DateTime now = rtc.now();
+  return now.year() * (unsigned long)10000 + now.month() * (unsigned long)100 + now.date();
+}
+
 int TimeHelper::getYear() {
   DateTime now = rtc.now();
   return now.year();
+}
+
+int TimeHelper::getMonth() {
+  DateTime now = rtc.now();
+  return now.month();
+}
+
+int TimeHelper::getDate() {
+  DateTime now = rtc.now();
+  return now.date();
 }

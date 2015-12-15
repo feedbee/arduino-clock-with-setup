@@ -9,7 +9,7 @@
 Controller::Controller(ButtonBlock *buttonBlock, Display *display) {
   _bb = buttonBlock;
   _display = display;
-  _mode = dtm_show;  // Default mode
+  _currentState = dtm_show;  // Default mode
   initFSM();
 }
 
@@ -34,35 +34,35 @@ Controller::Controller(ButtonBlock *buttonBlock, Display *display) {
 //    btn_D_enter
 //};
 void Controller::initFSM(void) {
-  _stateTransitionMatrix[dtm_show][btn_A_cancel] = { dtm_off, &Controller::dtm_off_on_transition };
-  _stateTransitionMatrix[dtm_show][btn_D_enter] = { dtm_set_year, &Controller::dtm_set_year_transition };
+  _stateMatrix[dtm_show][btn_A_cancel] = { dtm_off, &Controller::dtm_off_on_transition };
+  _stateMatrix[dtm_show][btn_D_enter] = { dtm_set_year, &Controller::dtm_set_year_transition };
 
-  _stateTransitionMatrix[dtm_set_year][btn_A_cancel] = { dtm_show, &Controller::dtm_common_transition_clear };
-  _stateTransitionMatrix[dtm_set_year][btn_B_left] = { dtm_set_year, NULL };
-  _stateTransitionMatrix[dtm_set_year][btn_C_right] = { dtm_set_year, NULL };
-  _stateTransitionMatrix[dtm_set_year][btn_D_enter] = { dtm_set_month, &Controller::dtm_common_transition_clear };
+  _stateMatrix[dtm_set_year][btn_A_cancel] = { dtm_show, &Controller::dtm_common_transition_clear };
+  _stateMatrix[dtm_set_year][btn_B_left] = { dtm_set_year, &Controller::dtm_common_lower };
+  _stateMatrix[dtm_set_year][btn_C_right] = { dtm_set_year, &Controller::dtm_common_higher };
+  _stateMatrix[dtm_set_year][btn_D_enter] = { dtm_set_month, &Controller::dtm_common_transition_clear };
 
-  _stateTransitionMatrix[dtm_off][btn_D_enter] = { dtm_show, &Controller::dtm_off_on_transition };
+  _stateMatrix[dtm_off][btn_D_enter] = { dtm_show, &Controller::dtm_off_on_transition };
 }
 
 void Controller::loop(void) {
   unsigned char b = _bb->getPressedButton();
   enum signals signal = _buttonToSignalMap[b];
-  if (signal && _stateTransitionMatrix[_mode][signal].newState) {
-    transitionInfo tri = _stateTransitionMatrix[_mode][signal];
-    enum states oldMode = _mode;
-    _mode = tri.newState;
+  if (signal && _stateMatrix[_currentState][signal].newState) {
+    transitionInfo tri = _stateMatrix[_currentState][signal];
+    enum states oldMode = _currentState;
+    _currentState = tri.newState;
     if (tri.transition) {
-      (this->*(tri.transition))(oldMode, _mode, signal);
+      (this->*(tri.transition))(oldMode, _currentState, signal);
     }
   }
 
-  modeLoop callback = loops[_mode];
+  modeLoop callback = loops[_currentState];
   if (!callback) {
     _display->println("Invalid mode");
     return;
   }
-  (this->*callback)(_mode, signal);
+  (this->*callback)(_currentState, signal);
 }
 
 void Controller::dtm_show_cl(enum states state, enum signals signal) {
@@ -86,7 +86,7 @@ void Controller::dtm_set_year_cl(enum states state, enum signals signal) {
   if (cmillis < lastBlink || cmillis - lastBlink >= 500) {
     show = !show;
     if (show) {
-      _display->print(TimeHelper::getYear());
+      _display->print((int)(_newDate / (unsigned long)10000));
     } else {
       _display->clearLine();
     }
@@ -121,6 +121,9 @@ void Controller::dtm_set_year_transition(enum states stateOld, enum states state
                   enum signals signal) {
   _display->clear();
   _display->println("Set year:");
+
+  _newDate = TimeHelper::getYMD_long();
+  _newTime = 0;
 }
 
 void Controller::dtm_off_on_transition(enum states stateOld, enum states stateNew,
@@ -135,4 +138,15 @@ void Controller::dtm_off_on_transition(enum states stateOld, enum states stateNe
 void Controller::dtm_common_transition_clear(enum states stateOld, enum states stateNew,
                   enum signals signal) {
   _display->clear();
+}
+
+
+void Controller::dtm_common_lower(enum states stateOld, enum states stateNew,
+                      enum signals signal) {
+  _newDate -= 1 * (unsigned long)10000;
+}
+
+void Controller::dtm_common_higher(enum states stateOld, enum states stateNew,
+                      enum signals signal) {
+  _newDate += 1 * (unsigned long)10000;
 }

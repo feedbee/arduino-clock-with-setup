@@ -15,9 +15,22 @@ class TimeHelper {
   void
   static
   getDateAndTime(char* date, char* time);
+
+  unsigned long
+  static
+  getYMD_long();
+
   int
   static
   getYear();
+
+  int
+  static
+  getMonth();
+
+  int
+  static
+  getDate();
 
  private:
   static
