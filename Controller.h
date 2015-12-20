@@ -54,6 +54,15 @@ class Controller {
 
   unsigned long _newDate;
   unsigned long _newTime;
+  enum setMode {
+    sm_year,
+    sm_month,
+    sm_date,
+    sm_hours,
+    sm_minutes,
+    sm_seconds
+  };
+  enum setMode _currentSetMode;
 
   transitionInfo _stateMatrix[cnt_st][cnt_sg];
   void initFSM(void);
@@ -69,36 +78,43 @@ class Controller {
   modeLoop loops[10] = {
       NULL,
       &Controller::dtm_show_cl,
-      &Controller::dtm_set_year_cl,
-      NULL,  //    dtm_set_month_cl,
-      NULL,  //    dtm_set_date_cl,
-      NULL,  //    dtm_set_day_cl,
-      NULL,  //    dtm_set_hours_cl,
-      NULL,  //    dtm_set_minutes_cl,
-      NULL,  //    dtm_set_seconds_cl,
+      &Controller::dtm_set_xxx_cl,
+      &Controller::dtm_set_xxx_cl,
+      &Controller::dtm_set_xxx_cl,
+      &Controller::dtm_set_xxx_cl,
+      &Controller::dtm_set_xxx_cl,
+      &Controller::dtm_set_xxx_cl,
+      &Controller::dtm_set_xxx_cl,
       &Controller::dtm_off_cl
   };
   void dtm_show_cl(enum states state, enum signals signal);
-  void dtm_set_year_cl(enum states state, enum signals signal);
+  void dtm_set_xxx_cl(enum states state, enum signals signal);
   void dtm_off_cl(enum states state, enum signals signal);
 
   void dtm_set_year_transition(enum states stateOld, enum states stateNew,
-                    enum signals signal);
+                               enum signals signal);
+  void dtm_set_month_transition(enum states stateOld, enum states stateNew,
+                                enum signals signal);
+  void dtm_set_date_transition(enum states stateOld, enum states stateNew,
+                               enum signals signal);
+  void dtm_set_hours_transition(enum states stateOld, enum states stateNew,
+                                enum signals signal);
+  void dtm_set_minutes_transition(enum states stateOld, enum states stateNew,
+                                  enum signals signal);
+  void dtm_set_seconds_transition(enum states stateOld, enum states stateNew,
+                                  enum signals signal);
   void dtm_off_on_transition(enum states stateOld, enum states stateNew,
-                  enum signals signal);
+                             enum signals signal);
   void dtm_common_transition_clear(enum states stateOld, enum states stateNew,
-                    enum signals signal);
+                                   enum signals signal);
+  void dtm_common_offset(enum states stateOld, enum states stateNew,
+                         enum signals signal, int offset);
   void dtm_common_lower(enum states stateOld, enum states stateNew,
                         enum signals signal);
   void dtm_common_higher(enum states stateOld, enum states stateNew,
-                        enum signals signal);
+                         enum signals signal);
+  void dtm_set_time(enum states stateOld, enum states stateNew,
+                    enum signals signal);
 };
-
-//void dtm_set_month_cl(enum states state, enum signals signal);
-//void dtm_set_date_cl(enum states state, enum signals signal);
-//void dtm_set_day_cl(enum states state, enum signals signal);
-//void dtm_set_hours_cl(enum states state, enum signals signal);
-//void dtm_set_minutes_cl(enum states state, enum signals signal);
-//void dtm_set_seconds_cl(enum states state, enum signals signal);
 
 #endif /* CONTROLLER_H_ */

@@ -35,7 +35,7 @@ unsigned char ButtonBlock::getPressedButton(void) {
 }
 
 unsigned char ButtonBlock::detectButton(int value) {
-  int levels[4] = { 0, 131, 314, 502 };
+  int levels[4] = { 0, 150, 351, 502 };
   for (unsigned char i = 0; i < 4; i++) {
     if ((levels[i] <= BB_VALUE_OFFSET || value > levels[i] - BB_VALUE_OFFSET)
     &&

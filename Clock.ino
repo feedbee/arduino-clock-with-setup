@@ -11,7 +11,7 @@ Display display;
 #include "ButtonBlock.h"
 #include "Controller.h"
 
-#define VERSION "2.3.2"
+#define VERSION "2.3.6"
 
 ButtonBlock bb(A0);
 Controller ctrl(&bb, &display);
@@ -27,7 +27,6 @@ void setup() {
   rtc.begin();
 }
 
-int i;
 void loop() {
   ctrl.loop();
   delay(100);

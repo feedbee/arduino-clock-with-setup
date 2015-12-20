@@ -21,6 +21,23 @@ unsigned long TimeHelper::getYMD_long() {
   return now.year() * (unsigned long)10000 + now.month() * (unsigned long)100 + now.date();
 }
 
+unsigned long TimeHelper::getHMS_long() {
+  DateTime now = rtc.now();
+  return now.hour() * (unsigned long)10000 + now.minute() * (unsigned long)100 + now.second();
+}
+
+void TimeHelper::setYMD_HMS_long(unsigned long newDate, unsigned long newTime) {
+  unsigned long y, m, d, hr, min, sec;
+  y = newDate / (unsigned long)10000;
+  m = newDate / (unsigned long)100 % (unsigned long)100;
+  d = newDate % (unsigned long)100;
+  hr = newTime / (unsigned long)10000;
+  min = newTime / (unsigned long)100 % (unsigned long)100;
+  sec = newTime % (unsigned long)100;
+  DateTime dt = DateTime(y, m, d, hr, min, sec, 0);
+  rtc.setDateTime(dt);
+}
+
 int TimeHelper::getYear() {
   DateTime now = rtc.now();
   return now.year();
