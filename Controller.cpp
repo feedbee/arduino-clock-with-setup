@@ -50,9 +50,14 @@ void Controller::initFSM(void) {
   _stateMatrix[dtm_set_date][btn_A_cancel] = { dtm_set_month, &Controller::dtm_set_month_transition };
   _stateMatrix[dtm_set_date][btn_B_left] = { dtm_set_date, &Controller::dtm_common_lower };
   _stateMatrix[dtm_set_date][btn_C_right] = { dtm_set_date, &Controller::dtm_common_higher };
-  _stateMatrix[dtm_set_date][btn_D_enter] = { dtm_set_hours, &Controller::dtm_set_hours_transition };
+  _stateMatrix[dtm_set_date][btn_D_enter] = { dtm_set_wday, &Controller::dtm_set_wday_transition };
 
-  _stateMatrix[dtm_set_hours][btn_A_cancel] = { dtm_set_date, &Controller::dtm_set_date_transition };
+  _stateMatrix[dtm_set_wday][btn_A_cancel] = { dtm_set_month, &Controller::dtm_set_date_transition };
+  _stateMatrix[dtm_set_wday][btn_B_left] = { dtm_set_wday, &Controller::dtm_wday_lower };
+  _stateMatrix[dtm_set_wday][btn_C_right] = { dtm_set_wday, &Controller::dtm_wday_higher };
+  _stateMatrix[dtm_set_wday][btn_D_enter] = { dtm_set_hours, &Controller::dtm_set_hours_transition };
+
+  _stateMatrix[dtm_set_hours][btn_A_cancel] = { dtm_set_wday, &Controller::dtm_set_wday_transition };
   _stateMatrix[dtm_set_hours][btn_B_left] = { dtm_set_hours, &Controller::dtm_common_lower };
   _stateMatrix[dtm_set_hours][btn_C_right] = { dtm_set_hours, &Controller::dtm_common_higher };
   _stateMatrix[dtm_set_hours][btn_D_enter] = { dtm_set_minutes, &Controller::dtm_set_minutes_transition };
@@ -112,16 +117,20 @@ void Controller::dtm_set_xxx_cl(enum states state, enum signals signal) {
   if (cmillis < lastBlink || cmillis - lastBlink >= 500 + (unsigned int)show * 500) {
     show = !show;
     if (show) {
-      int value = 0;
       switch (_currentSetMode) {
-        case sm_year: value = _newDate / (unsigned long)10000; break;
-        case sm_month: value = _newDate / (unsigned long)100 % (unsigned long)100; break;
-        case sm_date: value = _newDate % (unsigned long)100; break;
-        case sm_hours: value = _newTime / (unsigned long)10000; break;
-        case sm_minutes: value = _newTime / (unsigned long)100 % (unsigned long)100; break;
-        case sm_seconds: value = _newTime % (unsigned long)100; break;
+        case sm_year: _display->print(_newDate / (unsigned long)10000); break;
+        case sm_month: _display->print(_newDate / (unsigned long)100 % (unsigned long)100); break;
+        case sm_date: _display->print(_newDate % (unsigned long)100); break;
+        case sm_hours: _display->print(_newTime / (unsigned long)10000); break;
+        case sm_minutes: _display->print(_newTime / (unsigned long)100 % (unsigned long)100); break;
+        case sm_seconds: _display->print(_newTime % (unsigned long)100); break;
+
+        case sm_wday:
+          char cvalue[4];
+          TimeHelper::getWeekdayName(_newWDay, cvalue);
+          _display->print(cvalue);
+          break;
       }
-      _display->print(value);
     } else {
       _display->clearLine();
     }
@@ -142,6 +151,7 @@ void Controller::dtm_set_year_transition(enum states stateOld, enum states state
 
   _newDate = TimeHelper::getYMD_long();
   _newTime = TimeHelper::getHMS_long();
+  _newWDay = TimeHelper::getWeekday();
 }
 
 void Controller::dtm_set_month_transition(enum states stateOld, enum states stateNew,
@@ -158,6 +168,14 @@ void Controller::dtm_set_date_transition(enum states stateOld, enum states state
   _display->println("Set date:");
 
   _currentSetMode = sm_date;
+}
+
+void Controller::dtm_set_wday_transition(enum states stateOld, enum states stateNew,
+                  enum signals signal) {
+  _display->clear();
+  _display->println("Set week day:");
+
+  _currentSetMode = sm_wday;
 }
 
 void Controller::dtm_set_hours_transition(enum states stateOld, enum states stateNew,
@@ -257,6 +275,7 @@ void Controller::dtm_common_offset(enum states stateOld, enum states stateNew,
         _newTime += offset;
       }
       break;
+    default: break;
   }
 }
 
@@ -269,8 +288,17 @@ void Controller::dtm_common_higher(enum states stateOld, enum states stateNew,
   dtm_common_offset(stateOld, stateNew, signal, 1);
 }
 
+void Controller::dtm_wday_lower(enum states stateOld, enum states stateNew,
+                      enum signals signal) {
+  _newWDay <= 0 ? _newWDay = 6 : _newWDay--;
+}
+void Controller::dtm_wday_higher(enum states stateOld, enum states stateNew,
+                      enum signals signal) {
+  _newWDay >= 6 ? _newWDay = 0 : _newWDay++;
+}
+
 void Controller::dtm_set_time(enum states stateOld, enum states stateNew,
                       enum signals signal) {
   _display->clear();
-  TimeHelper::setYMD_HMS_long(_newDate, _newTime);
+  TimeHelper::setYMD_HMS_wday(_newDate, _newTime, _newWDay);
 }

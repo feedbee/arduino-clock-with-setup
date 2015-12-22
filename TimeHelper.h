@@ -17,7 +17,14 @@ class TimeHelper {
   unsigned long static getYMD_long();
   unsigned long static getHMS_long();
 
-  void static setYMD_HMS_long(unsigned long newDate, unsigned long newTime);
+  void static setYMD_HMS_wday(unsigned long newDate, unsigned long newTime, uint8_t wday);
+
+  /**
+   * 0 for Sunday, 6 for Saturday
+   */
+  uint8_t static getWeekday();
+
+  void static getWeekdayName(uint8_t index, char* buffer);
 
   int static getYear();
   int static getMonth();

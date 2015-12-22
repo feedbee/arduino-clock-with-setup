@@ -11,7 +11,7 @@ Display display;
 #include "ButtonBlock.h"
 #include "Controller.h"
 
-#define VERSION "2.3.6"
+#define VERSION "2.4.0"
 
 ButtonBlock bb(A0);
 Controller ctrl(&bb, &display);

@@ -8,7 +8,7 @@
 #include <Sodaq_DS3231.h>
 
 void TimeHelper::getDateAndTime(char* date, char* time) {
-  static char weekDay[][4] = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
+  char weekDay[][4] = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
 
   DateTime now = rtc.now();
 
@@ -26,7 +26,7 @@ unsigned long TimeHelper::getHMS_long() {
   return now.hour() * (unsigned long)10000 + now.minute() * (unsigned long)100 + now.second();
 }
 
-void TimeHelper::setYMD_HMS_long(unsigned long newDate, unsigned long newTime) {
+void TimeHelper::setYMD_HMS_wday(unsigned long newDate, unsigned long newTime, uint8_t wday) {
   unsigned long y, m, d, hr, min, sec;
   y = newDate / (unsigned long)10000;
   m = newDate / (unsigned long)100 % (unsigned long)100;
@@ -34,8 +34,23 @@ void TimeHelper::setYMD_HMS_long(unsigned long newDate, unsigned long newTime) {
   hr = newTime / (unsigned long)10000;
   min = newTime / (unsigned long)100 % (unsigned long)100;
   sec = newTime % (unsigned long)100;
-  DateTime dt = DateTime(y, m, d, hr, min, sec, 0);
+  DateTime dt = DateTime(y, m, d, hr, min, sec, wday);
   rtc.setDateTime(dt);
+}
+
+/**
+ * 0 for Sunday, 6 for Saturday
+ */
+uint8_t TimeHelper::getWeekday() {
+  return rtc.now().dayOfWeek();
+}
+
+/**
+ * 0 for Sunday, 6 for Saturday
+ */
+void TimeHelper::getWeekdayName(uint8_t index, char* buffer) {
+  char weekDay[][4] = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
+  strcpy(buffer, weekDay[index]);
 }
 
 int TimeHelper::getYear() {

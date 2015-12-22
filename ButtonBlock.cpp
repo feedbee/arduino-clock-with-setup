@@ -7,7 +7,7 @@
 
 #include "ButtonBlock.h"
 
-#define BB_VALUE_OFFSET 10
+#define BB_VALUE_OFFSET 50
 #define BB_VALUE_UPPER_BOUND 1023 - BB_VALUE_OFFSET
 
 ButtonBlock::ButtonBlock() {

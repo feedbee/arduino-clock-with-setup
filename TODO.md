@@ -1,9 +1,11 @@
 TODO List
 =========
 
-- Set week day
+- Extract Clock module from Controller
+
 - Buttons click fixation
 - Buttons click and hold distinction
-- 12/24 format selection
+
+- Real calendar restrictions (days per month, leap year, etc.)
+- 12/24-hours format selection
 - Date format selection (DDDD-MM-YY, MM/DD/YYYY, DD.MM.YYYY)
-- Extract Clock module from Controller

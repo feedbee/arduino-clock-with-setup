@@ -19,6 +19,7 @@ class Controller {
     dtm_set_month,
     dtm_set_date,
     dtm_set_day,
+    dtm_set_wday,
     dtm_set_hours,
     dtm_set_minutes,
     dtm_set_seconds,
@@ -54,10 +55,12 @@ class Controller {
 
   unsigned long _newDate;
   unsigned long _newTime;
+  uint8_t _newWDay;
   enum setMode {
     sm_year,
     sm_month,
     sm_date,
+    sm_wday,
     sm_hours,
     sm_minutes,
     sm_seconds
@@ -75,9 +78,10 @@ class Controller {
       btn_A_cancel
   };
 
-  modeLoop loops[10] = {
+  modeLoop loops[11] = {
       NULL,
       &Controller::dtm_show_cl,
+      &Controller::dtm_set_xxx_cl,
       &Controller::dtm_set_xxx_cl,
       &Controller::dtm_set_xxx_cl,
       &Controller::dtm_set_xxx_cl,
@@ -97,6 +101,8 @@ class Controller {
                                 enum signals signal);
   void dtm_set_date_transition(enum states stateOld, enum states stateNew,
                                enum signals signal);
+  void dtm_set_wday_transition(enum states stateOld, enum states stateNew,
+                               enum signals signal);
   void dtm_set_hours_transition(enum states stateOld, enum states stateNew,
                                 enum signals signal);
   void dtm_set_minutes_transition(enum states stateOld, enum states stateNew,
@@ -113,6 +119,10 @@ class Controller {
                         enum signals signal);
   void dtm_common_higher(enum states stateOld, enum states stateNew,
                          enum signals signal);
+  void dtm_wday_lower(enum states stateOld, enum states stateNew,
+                      enum signals signal);
+  void dtm_wday_higher(enum states stateOld, enum states stateNew,
+                       enum signals signal);
   void dtm_set_time(enum states stateOld, enum states stateNew,
                     enum signals signal);
 };
