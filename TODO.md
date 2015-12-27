@@ -1,7 +1,6 @@
 TODO List
 =========
 
-- Buttons click fixation
 - Buttons click and hold distinction
 
 - Real calendar restrictions (days per month, leap year, etc.)

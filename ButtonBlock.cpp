@@ -28,18 +28,22 @@ unsigned char ButtonBlock::getPressedButton(void) {
   unsigned char button = detectButton(analogRead(_pin));
   delay(10);
   if (button == detectButton(analogRead(_pin))) {
-    return button;
-  } else {
-    return BB_BUTTON_EMPTY;
+    if (button == BB_BUTTON_EMPTY && _wasPressed != BB_BUTTON_EMPTY) {
+      unsigned char x = _wasPressed;
+      _wasPressed = BB_BUTTON_EMPTY;
+      return x;
+    }
+    _wasPressed = button;
   }
+  return BB_BUTTON_EMPTY;
 }
 
 unsigned char ButtonBlock::detectButton(int value) {
   int levels[4] = { 0, 150, 351, 502 };
   for (unsigned char i = 0; i < 4; i++) {
     if ((levels[i] <= BB_VALUE_OFFSET || value > levels[i] - BB_VALUE_OFFSET)
-    &&
-    (levels[i] >= BB_VALUE_UPPER_BOUND || value < levels[i] + BB_VALUE_OFFSET)) {
+        && (levels[i] >= BB_VALUE_UPPER_BOUND
+            || value < levels[i] + BB_VALUE_OFFSET)) {
       return i + 1;
     }
   }
