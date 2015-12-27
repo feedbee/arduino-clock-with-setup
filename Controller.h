@@ -8,24 +8,11 @@
 #include "TimeHelper.h"
 #include "ButtonBlock.h"
 #include "Display.h"
-#include "Controller.h"
+
+#define CTRL_STATES_COUNT 11
 
 class Controller {
  public:
-  enum states {
-    dtm_no_state = 0,
-    dtm_show,
-    dtm_set_year,
-    dtm_set_month,
-    dtm_set_date,
-    dtm_set_day,
-    dtm_set_wday,
-    dtm_set_hours,
-    dtm_set_minutes,
-    dtm_set_seconds,
-    dtm_off,
-    cnt_st
-  };
 
   enum signals {
     btn_no_signal = 0,
@@ -36,95 +23,107 @@ class Controller {
     cnt_sg
   };
 
-  typedef void (Controller::*modeLoop)(enum states state, enum signals signal);
-  typedef void (Controller::*modeTransition)(enum states stateOld, enum states stateNew,
-      enum signals signal);
+  // ---
 
-  struct transitionInfo {
-    enum states newState;
-    modeTransition transition;
+  struct CallBase {
+    void operator()(uint8_t state, enum signals signal) {
+      Call(state, signal);
+    }
+   protected:
+    virtual void Call(uint8_t state, enum signals signal) = 0;
   };
 
-  Controller(ButtonBlock *bbb, Display *display);
+  template<class T>
+  class IndirectCall : public CallBase {
+   public:
+    typedef void (T::*Method)(uint8_t, enum signals signal);
+    IndirectCall(T* target, Method method)
+        : target(target),
+          method(method) {
+    }
+   private:
+    T* target;
+    Method method;
+    virtual void Call(uint8_t state, enum signals signal) override
+    {
+      (target->*method)(state, signal);
+    }
+  };
+
+  template<class T>
+  IndirectCall<T>* CreateIndirectCall(T* ptr,
+                                      typename IndirectCall<T>::Method method) {
+    return new IndirectCall<T>(ptr, method);
+  }
+
+  // ---
+
+  // ---
+
+  struct CallBaseTr {
+    void operator()(uint8_t stateOld, uint8_t stateNew, enum signals signal) {
+      Call(stateOld, stateNew, signal);
+    }
+   protected:
+    virtual void Call(uint8_t stateOld, uint8_t stateNew,
+                      enum signals signal) = 0;
+  };
+
+  template<class T>
+  class IndirectCallTr : public CallBaseTr {
+   public:
+    typedef void (T::*Method)(uint8_t, uint8_t, enum signals signal);
+    IndirectCallTr(T* target, Method method)
+        : target(target),
+          method(method) {
+    }
+   private:
+    T* target;
+    Method method;
+    virtual void Call(uint8_t stateOld, uint8_t stateNew, enum signals signal)
+        override
+        {
+      (target->*method)(stateOld, stateNew, signal);
+    }
+  };
+
+  template<class T>
+  IndirectCallTr<T>* CreateIndirectCallTr(
+      T* ptr, typename IndirectCallTr<T>::Method method) {
+    return new IndirectCallTr<T>(ptr, method);
+  }
+
+  // ---
+
+  struct transitionInfo {
+    uint8_t newState;
+    CallBaseTr* transition;
+  };
+
+  Controller(ButtonBlock *bbb, Display *display)
+      : _bb(bbb),
+        _display(display) {
+  }
+
   void loop(void);
+
+  void setState(const uint8_t state);
+
+  void addLoop(const uint8_t state, CallBase *callback);
+  void addStateTr(const uint8_t state, enum signals signal,
+                  struct transitionInfo trInfo);
 
  private:
   ButtonBlock* _bb;
   Display* _display;
-  enum states _currentState;
+  uint8_t _currentState = 0;
 
-  unsigned long _newDate;
-  unsigned long _newTime;
-  uint8_t _newWDay;
-  enum setMode {
-    sm_year,
-    sm_month,
-    sm_date,
-    sm_wday,
-    sm_hours,
-    sm_minutes,
-    sm_seconds
-  };
-  enum setMode _currentSetMode;
+  transitionInfo _stateMatrix[CTRL_STATES_COUNT][cnt_sg];
 
-  transitionInfo _stateMatrix[cnt_st][cnt_sg];
-  void initFSM(void);
+  CallBase* loops[CTRL_STATES_COUNT];
 
-  enum signals _buttonToSignalMap[5] = {
-      btn_no_signal,
-      btn_D_enter,
-      btn_C_right,
-      btn_B_left,
-      btn_A_cancel
-  };
-
-  modeLoop loops[11] = {
-      NULL,
-      &Controller::dtm_show_cl,
-      &Controller::dtm_set_xxx_cl,
-      &Controller::dtm_set_xxx_cl,
-      &Controller::dtm_set_xxx_cl,
-      &Controller::dtm_set_xxx_cl,
-      &Controller::dtm_set_xxx_cl,
-      &Controller::dtm_set_xxx_cl,
-      &Controller::dtm_set_xxx_cl,
-      &Controller::dtm_set_xxx_cl,
-      &Controller::dtm_off_cl
-  };
-  void dtm_show_cl(enum states state, enum signals signal);
-  void dtm_set_xxx_cl(enum states state, enum signals signal);
-  void dtm_off_cl(enum states state, enum signals signal);
-
-  void dtm_set_year_transition(enum states stateOld, enum states stateNew,
-                               enum signals signal);
-  void dtm_set_month_transition(enum states stateOld, enum states stateNew,
-                                enum signals signal);
-  void dtm_set_date_transition(enum states stateOld, enum states stateNew,
-                               enum signals signal);
-  void dtm_set_wday_transition(enum states stateOld, enum states stateNew,
-                               enum signals signal);
-  void dtm_set_hours_transition(enum states stateOld, enum states stateNew,
-                                enum signals signal);
-  void dtm_set_minutes_transition(enum states stateOld, enum states stateNew,
-                                  enum signals signal);
-  void dtm_set_seconds_transition(enum states stateOld, enum states stateNew,
-                                  enum signals signal);
-  void dtm_off_on_transition(enum states stateOld, enum states stateNew,
-                             enum signals signal);
-  void dtm_common_transition_clear(enum states stateOld, enum states stateNew,
-                                   enum signals signal);
-  void dtm_common_offset(enum states stateOld, enum states stateNew,
-                         enum signals signal, int offset);
-  void dtm_common_lower(enum states stateOld, enum states stateNew,
-                        enum signals signal);
-  void dtm_common_higher(enum states stateOld, enum states stateNew,
-                         enum signals signal);
-  void dtm_wday_lower(enum states stateOld, enum states stateNew,
-                      enum signals signal);
-  void dtm_wday_higher(enum states stateOld, enum states stateNew,
-                       enum signals signal);
-  void dtm_set_time(enum states stateOld, enum states stateNew,
-                    enum signals signal);
+  enum signals _buttonToSignalMap[5] = { btn_no_signal, btn_D_enter,
+      btn_C_right, btn_B_left, btn_A_cancel };
 };
 
 #endif /* CONTROLLER_H_ */

@@ -10,11 +10,13 @@ Display display;
 #include "TimeHelper.h"
 #include "ButtonBlock.h"
 #include "Controller.h"
+#include "Modules/ClockModule.h"
 
-#define VERSION "2.4.0"
+#define VERSION "2.5.1"
 
 ButtonBlock bb(A0);
 Controller ctrl(&bb, &display);
+ClockModule cm(&ctrl, &display);
 
 void setup() {
   display.begin(16, 2);
@@ -23,6 +25,8 @@ void setup() {
   display.println("v." VERSION);
   delay(1000);
   display.clear();
+
+  ctrl.setState(ClockModule::dtm_show); // Default mode
 
   rtc.begin();
 }

@@ -12,7 +12,7 @@ void TimeHelper::getDateAndTime(char* date, char* time) {
 
   DateTime now = rtc.now();
 
-  sprintf(date, "%04d-%02d-%02d, %s", now.year(), now.month(), now.date(), weekDay[now.dayOfWeek()]);
+  sprintf(date, "%04d-%02d-%02d, %s", now.year(), now.month(), now.date(), weekDay[now.dayOfWeek() - 1]);
   sprintf(time, "%02d:%02d:%02d", now.hour(), now.minute(), now.second());
 }
 
@@ -34,7 +34,7 @@ void TimeHelper::setYMD_HMS_wday(unsigned long newDate, unsigned long newTime, u
   hr = newTime / (unsigned long)10000;
   min = newTime / (unsigned long)100 % (unsigned long)100;
   sec = newTime % (unsigned long)100;
-  DateTime dt = DateTime(y, m, d, hr, min, sec, wday);
+  DateTime dt = DateTime(y, m, d, hr, min, sec, wday + 1);
   rtc.setDateTime(dt);
 }
 
@@ -42,7 +42,7 @@ void TimeHelper::setYMD_HMS_wday(unsigned long newDate, unsigned long newTime, u
  * 0 for Sunday, 6 for Saturday
  */
 uint8_t TimeHelper::getWeekday() {
-  return rtc.now().dayOfWeek();
+  return rtc.now().dayOfWeek() - 1;
 }
 
 /**

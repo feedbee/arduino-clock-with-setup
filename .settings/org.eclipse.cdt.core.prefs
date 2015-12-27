@@ -226,10 +226,10 @@ environment/project/it.baeyens.arduino.core.toolChain.release.1809780258/A.EXTRA
 environment/project/it.baeyens.arduino.core.toolChain.release.1809780258/A.EXTRA.TIME.DTS/value=0
 environment/project/it.baeyens.arduino.core.toolChain.release.1809780258/A.EXTRA.TIME.LOCAL/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.1809780258/A.EXTRA.TIME.LOCAL/operation=replace
-environment/project/it.baeyens.arduino.core.toolChain.release.1809780258/A.EXTRA.TIME.LOCAL/value=1450817433
+environment/project/it.baeyens.arduino.core.toolChain.release.1809780258/A.EXTRA.TIME.LOCAL/value=1451235624
 environment/project/it.baeyens.arduino.core.toolChain.release.1809780258/A.EXTRA.TIME.UTC/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.1809780258/A.EXTRA.TIME.UTC/operation=replace
-environment/project/it.baeyens.arduino.core.toolChain.release.1809780258/A.EXTRA.TIME.UTC/value=1450806633
+environment/project/it.baeyens.arduino.core.toolChain.release.1809780258/A.EXTRA.TIME.UTC/value=1451224824
 environment/project/it.baeyens.arduino.core.toolChain.release.1809780258/A.EXTRA.TIME.ZONE/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.1809780258/A.EXTRA.TIME.ZONE/operation=replace
 environment/project/it.baeyens.arduino.core.toolChain.release.1809780258/A.EXTRA.TIME.ZONE/value=10800
@@ -628,7 +628,7 @@ environment/project/it.baeyens.arduino.core.toolChain.release.1809780258/JANTJE.
 environment/project/it.baeyens.arduino.core.toolChain.release.1809780258/JANTJE.EXTRA.COMPILE/value=
 environment/project/it.baeyens.arduino.core.toolChain.release.1809780258/JANTJE.EXTRA.CPP.COMPILE/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.1809780258/JANTJE.EXTRA.CPP.COMPILE/operation=replace
-environment/project/it.baeyens.arduino.core.toolChain.release.1809780258/JANTJE.EXTRA.CPP.COMPILE/value=-std\=gnu++0x
+environment/project/it.baeyens.arduino.core.toolChain.release.1809780258/JANTJE.EXTRA.CPP.COMPILE/value=-std\=gnu++11
 environment/project/it.baeyens.arduino.core.toolChain.release.1809780258/JANTJE.PACKAGE_ID/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.1809780258/JANTJE.PACKAGE_ID/operation=replace
 environment/project/it.baeyens.arduino.core.toolChain.release.1809780258/JANTJE.PACKAGE_ID/value=arduino

@@ -1,8 +1,6 @@
 TODO List
 =========
 
-- Extract Clock module from Controller
-
 - Buttons click fixation
 - Buttons click and hold distinction
 
