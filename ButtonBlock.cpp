@@ -43,10 +43,9 @@ unsigned char ButtonBlock::getPressedButton(void) {
     }
 
   } else if (button != BB_BUTTON_EMPTY) {  // button is pressed now
-    if (pressedMills && millis() - pressedMills > 1000) {  // a button was halt for more than a second
-      if (haltTimes++ % 4 == 0) {
-        return button;  // fix hold every 4-th time (~(50+10) millis x 4 = 240 millis)
-      }
+    if (pressedMills && millis() - pressedMills > 1000
+        && haltTimes++ % 4 == 0) {  // a button was halt for more than a second
+      return button;  // fix hold every 4-th time (~(50+10) millis x 4 = ~240 millis)
     } else if (!pressedMills) {
       pressedMills = millis();
     }

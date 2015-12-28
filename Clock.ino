@@ -12,7 +12,7 @@ Display display;
 #include "Controller.h"
 #include "Modules/ClockModule.h"
 
-#define VERSION "2.6.0"
+#define VERSION "2.6.1"
 
 ButtonBlock bb(A0);
 Controller ctrl(&bb, &display);
