@@ -12,7 +12,7 @@ Display display;
 #include "Controller.h"
 #include "Modules/ClockModule.h"
 
-#define VERSION "2.5.1"
+#define VERSION "2.6.0"
 
 ButtonBlock bb(A0);
 Controller ctrl(&bb, &display);
@@ -33,5 +33,5 @@ void setup() {
 
 void loop() {
   ctrl.loop();
-  delay(100);
+  delay(50);
 }

@@ -25,17 +25,42 @@ void ButtonBlock::setup(unsigned char pin) {
 }
 
 unsigned char ButtonBlock::getPressedButton(void) {
-  unsigned char button = detectButton(analogRead(_pin));
-  delay(10);
-  if (button == detectButton(analogRead(_pin))) {
-    if (button == BB_BUTTON_EMPTY && _wasPressed != BB_BUTTON_EMPTY) {
-      unsigned char x = _wasPressed;
-      _wasPressed = BB_BUTTON_EMPTY;
-      return x;
+  static unsigned char _wasPressed = BB_BUTTON_EMPTY;
+  static unsigned int pressedMills = 0;
+  static unsigned int haltTimes = 0;
+
+  unsigned char button = readButton();
+
+  if (button == BB_BUTTON_EMPTY && _wasPressed != BB_BUTTON_EMPTY) {  // button is realized now
+    unsigned char tmpBuf = _wasPressed;
+    _wasPressed = BB_BUTTON_EMPTY;
+    pressedMills = 0;
+    if (!haltTimes) {
+      return tmpBuf;  // fix click
+    } else {
+      haltTimes = 0;
+      return BB_BUTTON_EMPTY;  // prevent click if hold was detected
     }
-    _wasPressed = button;
+
+  } else if (button != BB_BUTTON_EMPTY) {  // button is pressed now
+    if (pressedMills && millis() - pressedMills > 1000) {  // a button was halt for more than a second
+      if (haltTimes++ % 4 == 0) {
+        return button;  // fix hold every 4-th time (~(50+10) millis x 4 = 240 millis)
+      }
+    } else if (!pressedMills) {
+      pressedMills = millis();
+    }
   }
+
+  _wasPressed = button;
+
   return BB_BUTTON_EMPTY;
+}
+
+unsigned char ButtonBlock::readButton(void) {
+  unsigned char button = detectButton(analogRead(_pin));
+  delay(10);  // bounce protection
+  return button == detectButton(analogRead(_pin)) ? button : BB_BUTTON_EMPTY;
 }
 
 unsigned char ButtonBlock::detectButton(int value) {

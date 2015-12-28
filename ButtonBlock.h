@@ -25,7 +25,7 @@ class ButtonBlock {
  private:
   void setup(unsigned char pin);
   unsigned char _pin;
-  unsigned char _wasPressed;
+  unsigned char readButton(void);
   unsigned char detectButton(int value);
 };
 
